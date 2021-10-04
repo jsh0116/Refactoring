@@ -1,5 +1,40 @@
 /* 공연료 청구서 출력하는 코드 (refactoring 전) */
+
+/* Refactoring 내용
+ * 1. 함수 추출 : amountFor()
+ * 2. 변수 naming: result, aPerformance
+ * 3. play 변수 제거 : 임시 변수를 질의 함수로 바꾸기 : (play를 playFor() 호출로 변경)
+*/
+
 const statement = (invoices, plays) => {
+
+    const playFor = aPerformance => plays[aPerformance.playID];
+
+    // amountFor()를 statement()의 중첩 함수로 만든다
+    const amountFor = (aPerformance) => {
+        let result = 0;
+        switch (playFor(aPerformance).type) {
+            case "tragedy": {
+                result = 40000;
+                if (aPerformance.audience > 30) {
+                    result += 1000 * (aPerformance.audience - 30);
+                }
+                break;
+            }
+            case "comedy": {
+                result = 30000;
+                if (aPerformance.audience > 20) {
+                    result += 10000 + 500 * (aPerformance.audience - 20);
+                }
+                result += 300 * aPerformance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
+        }
+        return result;
+    }
+
     let totalAmount = 0; // 총액
     let volumeCredits = 0; // 적립포인트
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
@@ -10,37 +45,17 @@ const statement = (invoices, plays) => {
     }).format;
 
     for (let performance of invoices.performances) {
-        const play = plays[performance.playID]; // { "name": "Hamlet", "type": "tragedy" }
-        let thisAmount = 0;
-
-        switch (play.type) {
-            case "tragedy": {
-                thisAmount = 40000;
-                if (performance.audience > 30) {
-                    thisAmount += 1000 * (performance.audience - 30);
-                }
-                break;
-            }
-            case "comedy": {
-                thisAmount = 30000;
-                if (performance.audience > 20) {
-                    thisAmount += 10000 + 500 * (performance.audience - 20);
-                }
-                thisAmount += 300 * performance.audience;
-                break;
-            }
-            default:
-                throw new Error(`알 수 없는 장르: ${play.type}`);
-        }
         // 포인트 적립
         volumeCredits += Math.max(performance.audience - 30, 0);
+
         // comedy 관객 5명마다 추가 포인트 제공
-        if (play.type === 'comedy') {
+        if (playFor(performance).type === 'comedy') {
             volumeCredits += Math.floor(performance.audience / 5);
         }
+
         //청구 내역 출력
-        result += `${play.name}: ${format(thisAmount / 100)} (${performance.audience}석)\n`;
-        totalAmount += thisAmount;
+        result += `${playFor(performance).name}: ${format(amountFor(performance) / 100)} (${performance.audience}석)\n`;
+        totalAmount += amountFor(performance);
     }
     result += `총액: ${format(totalAmount / 100)}\n`;
     result += `적립포인트: ${volumeCredits}점\n`;
