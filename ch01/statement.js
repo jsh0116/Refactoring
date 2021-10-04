@@ -11,9 +11,9 @@ const statement = (invoices, plays) => {
     const playFor = aPerformance => plays[aPerformance.playID];
 
     // amountFor()를 statement()의 중첩 함수로 만든다
-    const amountFor = (aPerformance, play) => {
+    const amountFor = (aPerformance) => {
         let result = 0;
-        switch (play.type) {
+        switch (playFor(aPerformance).type) {
             case "tragedy": {
                 result = 40000;
                 if (aPerformance.audience > 30) {
@@ -30,10 +30,11 @@ const statement = (invoices, plays) => {
                 break;
             }
             default:
-                throw new Error(`알 수 없는 장르: ${play.type}`);
+                throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
         }
         return result;
     }
+
     let totalAmount = 0; // 총액
     let volumeCredits = 0; // 적립포인트
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
@@ -44,19 +45,18 @@ const statement = (invoices, plays) => {
     }).format;
 
     for (let performance of invoices.performances) {
-        const play = playFor(performance); // { "name": "Hamlet", "type": "tragedy" }
-        let thisAmount = amountFor(performance, play); // 추출한 함수를 이용
+        let thisAmount = amountFor(performance); // 추출한 함수를 이용
 
         // 포인트 적립
         volumeCredits += Math.max(performance.audience - 30, 0);
 
         // comedy 관객 5명마다 추가 포인트 제공
-        if (play.type === 'comedy') {
+        if (playFor(performance).type === 'comedy') {
             volumeCredits += Math.floor(performance.audience / 5);
         }
 
         //청구 내역 출력
-        result += `${play.name}: ${format(thisAmount / 100)} (${performance.audience}석)\n`;
+        result += `${playFor(performance).name}: ${format(thisAmount / 100)} (${performance.audience}석)\n`;
         totalAmount += thisAmount;
     }
     result += `총액: ${format(totalAmount / 100)}\n`;
