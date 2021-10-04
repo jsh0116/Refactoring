@@ -2,29 +2,31 @@
 
 /* Refactoring 내용
  * 1. 함수 추출 : amountFor()
+ * 2. 변수 naming: result, aPerformance
+ * 3. play 변수 제거 : 임시 변수를 질의 함수로 바꾸기 : (play를 playFor() 호출로 변경)
 */
 
 const statement = (invoices, plays) => {
-    let totalAmount = 0; // 총액
-    let volumeCredits = 0; // 적립포인트
+
+    const playFor = aPerformance => plays[aPerformance.playID];
 
     // amountFor()를 statement()의 중첩 함수로 만든다
-    const amountFor = (performance, play) => {
+    const amountFor = (aPerformance, play) => {
         let result = 0;
         switch (play.type) {
             case "tragedy": {
                 result = 40000;
-                if (performance.audience > 30) {
-                    result += 1000 * (performance.audience - 30);
+                if (aPerformance.audience > 30) {
+                    result += 1000 * (aPerformance.audience - 30);
                 }
                 break;
             }
             case "comedy": {
                 result = 30000;
-                if (performance.audience > 20) {
-                    result += 10000 + 500 * (performance.audience - 20);
+                if (aPerformance.audience > 20) {
+                    result += 10000 + 500 * (aPerformance.audience - 20);
                 }
-                result += 300 * performance.audience;
+                result += 300 * aPerformance.audience;
                 break;
             }
             default:
@@ -32,7 +34,8 @@ const statement = (invoices, plays) => {
         }
         return result;
     }
-
+    let totalAmount = 0; // 총액
+    let volumeCredits = 0; // 적립포인트
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
     const format = new Intl.NumberFormat("en-US", {
         style: "currency",
@@ -41,7 +44,7 @@ const statement = (invoices, plays) => {
     }).format;
 
     for (let performance of invoices.performances) {
-        const play = plays[performance.playID]; // { "name": "Hamlet", "type": "tragedy" }
+        const play = playFor(performance); // { "name": "Hamlet", "type": "tragedy" }
         let thisAmount = amountFor(performance, play); // 추출한 함수를 이용
 
         // 포인트 적립
