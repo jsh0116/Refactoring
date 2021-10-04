@@ -12,7 +12,6 @@ JavaScript 기반 공연료 청구서 출력
 
 ## 3. statement() 함수 쪼개기
 
-* from commit 40e95df8b5e335951d749b0b79adc4e0904b0609
 * statement()처럼 긴 함수를 refactoring 할때는 전체 동작을 각각의 부분으로 나눌 수 있는 지점을 찾는다
 * 함수 추출하기 적용 (흔히 IDE에서 자동으로 수행)
 * 변수의 이름을 변경(thisAmount -> result)하여 명확하게 해 변수의 역할을 쉽게 알 수 있도록 한다
