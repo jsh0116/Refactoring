@@ -45,8 +45,6 @@ const statement = (invoices, plays) => {
     }).format;
 
     for (let performance of invoices.performances) {
-        let thisAmount = amountFor(performance); // 추출한 함수를 이용
-
         // 포인트 적립
         volumeCredits += Math.max(performance.audience - 30, 0);
 
@@ -56,8 +54,8 @@ const statement = (invoices, plays) => {
         }
 
         //청구 내역 출력
-        result += `${playFor(performance).name}: ${format(thisAmount / 100)} (${performance.audience}석)\n`;
-        totalAmount += thisAmount;
+        result += `${playFor(performance).name}: ${format(amountFor(performance) / 100)} (${performance.audience}석)\n`;
+        totalAmount += amountFor(performance);
     }
     result += `총액: ${format(totalAmount / 100)}\n`;
     result += `적립포인트: ${volumeCredits}점\n`;
