@@ -35,6 +35,15 @@ const statement = (invoices, plays) => {
         return result;
     }
 
+    const volumeCreditsFor = (aPerformance) => {
+        let result = 0;
+        result += Math.max(aPerformance.audience - 30, 0);
+        if (playFor(aPerformance).type === 'comedy') {
+            result += Math.floor(aPerformance.audience / 5);
+        }
+        return result;
+    }
+
     let totalAmount = 0; // 총액
     let volumeCredits = 0; // 적립포인트
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
@@ -45,14 +54,7 @@ const statement = (invoices, plays) => {
     }).format;
 
     for (let performance of invoices.performances) {
-        // 포인트 적립
-        volumeCredits += Math.max(performance.audience - 30, 0);
-
-        // comedy 관객 5명마다 추가 포인트 제공
-        if (playFor(performance).type === 'comedy') {
-            volumeCredits += Math.floor(performance.audience / 5);
-        }
-
+        volumeCredits += volumeCreditsFor(performance);
         //청구 내역 출력
         result += `${playFor(performance).name}: ${format(amountFor(performance) / 100)} (${performance.audience}석)\n`;
         totalAmount += amountFor(performance);
