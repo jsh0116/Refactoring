@@ -60,15 +60,21 @@ const statement = (invoices, plays) => {
         return volumeCredits;
     }
 
-    let totalAmount = 0; // 총액
+    const tempFunc = () => {
+        let totalAmount = 0;
+        for (let performance of invoices.performances) {
+            totalAmount += amountFor(performance);
+        }
+        return totalAmount;
+    }
+
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
     
     for (let performance of invoices.performances) {
         //청구 내역 출력
-        result += `${playFor(performance).name}: ${usd(amountFor(performance))} (${performance.audience}석)\n`;
-        totalAmount += amountFor(performance);
+        result += `${playFor(performance).name}: ${usd(amountFor(performance))} (${performance.audience}석)\n`;    
     }
-    let volumeCredits = totalVolumeCredits(); // 적립포인트
+    let totalAmount = tempFunc(); // 함수 추출, 임시 이름 부여
     
     result += `총액: ${usd(totalAmount)}\n`;
     result += `적립포인트: ${totalVolumeCredits()}점\n`;
