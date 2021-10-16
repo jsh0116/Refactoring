@@ -4,6 +4,8 @@
  * 1. 함수 추출 : amountFor()
  * 2. 변수 naming: result, aPerformance
  * 3. play 변수 제거 : 임시 변수를 질의 함수로 바꾸기 : (play를 playFor() 호출로 변경)
+ * 4. format 변수 제거 및 함수 이름 변경
+ * 5. volumeCredits 변수 제거 : 반복문 쪼개기, 문장 슬라이드하기, 임시 변수를 질의 함수로 바꾸기
 */
 
 const statement = (invoices, plays) => {
@@ -44,23 +46,32 @@ const statement = (invoices, plays) => {
         return result;
     }
 
-    let totalAmount = 0; // 총액
-    let volumeCredits = 0; // 적립포인트
-    let result = `청구 내역 (고객명: ${invoices.customer})\n`;
-    const format = new Intl.NumberFormat("en-US", {
+    const usd = (aNumber) => new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: 'USD',
         minimumFractionDigits: 2
-    }).format;
+    }).format(aNumber/100);
 
+    const totalVolumeCredits = () => {
+        let volumeCredits = 0;
+        for(let performance of invoices.performances) {
+            volumeCredits += volumeCreditsFor(performance);
+        }
+        return volumeCredits;
+    }
+
+    let totalAmount = 0; // 총액
+    let result = `청구 내역 (고객명: ${invoices.customer})\n`;
+    
     for (let performance of invoices.performances) {
-        volumeCredits += volumeCreditsFor(performance);
         //청구 내역 출력
-        result += `${playFor(performance).name}: ${format(amountFor(performance) / 100)} (${performance.audience}석)\n`;
+        result += `${playFor(performance).name}: ${usd(amountFor(performance))} (${performance.audience}석)\n`;
         totalAmount += amountFor(performance);
     }
-    result += `총액: ${format(totalAmount / 100)}\n`;
-    result += `적립포인트: ${volumeCredits}점\n`;
+    let volumeCredits = totalVolumeCredits(); // 적립포인트
+    
+    result += `총액: ${usd(totalAmount)}\n`;
+    result += `적립포인트: ${totalVolumeCredits()}점\n`;
     return result;
 }
 
