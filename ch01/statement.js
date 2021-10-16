@@ -5,7 +5,7 @@
  * 2. 변수 naming: result, aPerformance
  * 3. play 변수 제거 : 임시 변수를 질의 함수로 바꾸기 : (play를 playFor() 호출로 변경)
  * 4. format 변수 제거 및 함수 이름 변경
- * 5. volumeCredits 변수 제거 : 반복문 쪼개기, 문장 슬라이드하기, 임시 변수를 질의 함수로 바꾸기
+ * 5. volumeCredits, totalAmount 변수 제거 : 반복문 쪼개기, 문장 슬라이드하기, 임시 변수를 질의 함수로 바꾸기
 */
 
 const statement = (invoices, plays) => {
@@ -53,19 +53,19 @@ const statement = (invoices, plays) => {
     }).format(aNumber/100);
 
     const totalVolumeCredits = () => {
-        let volumeCredits = 0;
+        let result = 0;
         for(let performance of invoices.performances) {
-            volumeCredits += volumeCreditsFor(performance);
+            result += volumeCreditsFor(performance);
         }
-        return volumeCredits;
+        return result;
     }
 
-    const tempFunc = () => {
-        let totalAmount = 0;
+    const totalAmount = () => {
+        let result = 0;
         for (let performance of invoices.performances) {
-            totalAmount += amountFor(performance);
+            result += amountFor(performance);
         }
-        return totalAmount;
+        return result;
     }
 
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
@@ -74,9 +74,8 @@ const statement = (invoices, plays) => {
         //청구 내역 출력
         result += `${playFor(performance).name}: ${usd(amountFor(performance))} (${performance.audience}석)\n`;    
     }
-    let totalAmount = tempFunc(); // 함수 추출, 임시 이름 부여
     
-    result += `총액: ${usd(totalAmount)}\n`;
+    result += `총액: ${usd(totalAmount())}\n`;
     result += `적립포인트: ${totalVolumeCredits()}점\n`;
     return result;
 }
