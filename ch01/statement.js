@@ -8,7 +8,7 @@
  * 5. volumeCredits, totalAmount 변수 제거 : 반복문 쪼개기, 문장 슬라이드하기, 임시 변수를 질의 함수로 바꾸기
 */
 
-const statement = (invoices, plays) => {
+const renderPlainText = (invoices, plays) => {
 
     const playFor = aPerformance => plays[aPerformance.playID];
 
@@ -69,15 +69,19 @@ const statement = (invoices, plays) => {
     }
 
     let result = `청구 내역 (고객명: ${invoices.customer})\n`;
-    
+
     for (let performance of invoices.performances) {
         //청구 내역 출력
         result += `${playFor(performance).name}: ${usd(amountFor(performance))} (${performance.audience}석)\n`;    
     }
-    
+
     result += `총액: ${usd(totalAmount())}\n`;
     result += `적립포인트: ${totalVolumeCredits()}점\n`;
     return result;
+};
+
+const statement = (invoices, plays) => {
+    return renderPlainText(invoices, plays);
 }
 
 export default statement;
